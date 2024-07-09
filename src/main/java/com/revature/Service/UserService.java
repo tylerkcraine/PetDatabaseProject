@@ -7,17 +7,12 @@ import com.revature.Util;
 public class UserService {
 
     private final UserDAOImpl userDAO = new UserDAOImpl();
-    public User createAccount(User user) throws IllegalArgumentException{
+    public User createUser(User user) throws IllegalArgumentException{
         if (user.getEmail().isBlank() |
                 user.getFirstName().isBlank() |
                 user.getLastName().isBlank()) {
-            throw new IllegalArgumentException();
+            return null;
         }
-
-        User u = userDAO.insertUser(user);
-        if (u == null) {
-            
-        }
-        return null;
+        return userDAO.insertUser(user);
     }
 }

@@ -7,6 +7,7 @@ import com.revature.Service.PetService;
 import com.revature.Service.UserService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 public class PetDatabaseController {
     private ObjectMapper mapper;
@@ -15,12 +16,18 @@ public class PetDatabaseController {
 
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        // TODO: Add endpoints
+        app.post("/register", this::createUserHandler);
         return app;
     }
 
-    private void createUsers(Context c) throws JsonProcessingException {
+    private void createUserHandler(Context c) throws JsonProcessingException {
         User user = this.mapper.readValue(c.body(), User.class);
-        User newUser = this.userService.createAccount(user);
+        User newUser = this.userService.createUser(user);
+        if (newUser == null) {
+            c.status(HttpStatus.BAD_REQUEST);
+        } else {
+            c.json(mapper.writeValueAsString(newUser));
+            c.status(HttpStatus.CREATED);
+        }
     }
 }
