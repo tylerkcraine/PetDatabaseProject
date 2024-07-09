@@ -27,12 +27,7 @@ public class Util {
         }
     }
 
-    public static Connection getConnection() {
-        try {
-            return ds.getConnection();
-        } catch (SQLException e) {
-            l.error("Unable to initialize database connection pool");
-        }
-        return null;
+    public static Connection getConnection() throws SQLException{
+        return ds.getConnection();
     }
 }
