@@ -28,6 +28,7 @@ public class Util {
     }
 
     public static Connection getConnection() throws SQLException{
+        l.info("jdbc info: " + Util.url);
         return ds.getConnection();
     }
 }

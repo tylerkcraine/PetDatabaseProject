@@ -28,7 +28,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User insertUser(User user) {
-        String sql = "INSERT INTO pets (first_name, last_name, email) VALUES (?,?,?)";
+        String sql = "INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)";
 
         try {
             Connection c = Util.getConnection();

@@ -12,9 +12,12 @@ import io.javalin.http.HttpStatus;
 public class PetDatabaseController {
     private ObjectMapper mapper;
     private UserService userService;
-    private PetService gameService;
+    private PetService petService;
 
     public Javalin startAPI() {
+        this.mapper = new ObjectMapper();
+        this.userService = new UserService();
+        this.petService = new PetService();
         Javalin app = Javalin.create();
         app.post("/register", this::createUserHandler);
         return app;
