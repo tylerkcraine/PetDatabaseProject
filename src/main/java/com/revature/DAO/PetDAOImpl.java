@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PetDAOImpl implements PetDAO {
     Logger l = LoggerFactory.getLogger(this.getClass());
@@ -44,7 +45,7 @@ public class PetDAOImpl implements PetDAO {
     }
 
     @Override
-    public Pet insertPet(Pet pet) {
+    public Optional<Pet> insertPet(Pet pet) {
         return null;
     }
 

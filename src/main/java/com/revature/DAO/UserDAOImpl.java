@@ -1,5 +1,6 @@
 package com.revature.DAO;
 
+import com.revature.Exception.UpdateException;
 import com.revature.Model.User;
 import com.revature.Util;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Optional;
 
 public class UserDAOImpl implements UserDAO {
 
@@ -17,21 +19,35 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return null;
     }
 
     @Override
-    public User findUserById(int id) {
-        return null;
+    public Optional<User> findUserById(int id) {
+        try (Connection c = Util.getConnection()) {
+            String sql = "SELECT * FROM user WHERE id = ?";
+            PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, id);
+
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                int newId = rs.getInt("id");
+
+                return Optional.of(new User(id, user.getFirstName(), user.getLastName(), user.getEmail()));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public User insertUser(User user) {
-        String sql = "INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)";
-
-        try {
-            Connection c = Util.getConnection();
+    public Optional<User> insertUser(User user) {
+        try (Connection c = Util.getConnection()) {
+            String sql = "INSERT INTO users (first_name, last_name, email) VALUES (?,?,?)";
             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -41,17 +57,17 @@ public class UserDAOImpl implements UserDAO {
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 int id = rs.getInt("id");
-                return new User(id, user.getFirstName(), user.getLastName(), user.getEmail());
+                return Optional.of(new User(id, user.getFirstName(), user.getLastName(), user.getEmail()));
+            } else {
+                return Optional.empty();
             }
         } catch (SQLException e) {
-            l.debug("insert failed in com.revature.DAO.UserDAOImpl.insertUser()");
-            l.error("insert User failed");
+            return Optional.empty();
         }
-        return null;
     }
 
     @Override
-    public User updateUser() {
+    public Optional<User> updateUser() {
         return null;
     }
 }
