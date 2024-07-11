@@ -1,6 +1,5 @@
 package com.revature.DAO;
 
-import com.revature.Exception.UpdateException;
 import com.revature.Model.User;
 import com.revature.Util;
 import org.slf4j.Logger;
@@ -26,20 +25,24 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public Optional<User> findUserById(int id) {
         try (Connection c = Util.getConnection()) {
-            String sql = "SELECT * FROM user WHERE id = ?";
-            PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            String sql = "SELECT * FROM users WHERE id = ?";
+            PreparedStatement ps = c.prepareStatement(sql);
             ps.setInt(1, id);
 
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
+            ps.executeQuery();
+            ResultSet rs = ps.getResultSet();
             if (rs.next()) {
                 int newId = rs.getInt("id");
-
-                return Optional.of(new User(id, user.getFirstName(), user.getLastName(), user.getEmail()));
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String email = rs.getString("email");
+                return Optional.of(new User(newId, firstName, lastName, email));
             } else {
                 return Optional.empty();
             }
         } catch (SQLException e) {
+            l.error("SQL Error in UserDAOImpl.findUserById()");
+            l.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -62,12 +65,32 @@ public class UserDAOImpl implements UserDAO {
                 return Optional.empty();
             }
         } catch (SQLException e) {
+            l.error("SQL Error in UserDAOImpl.insertUser()");
+            l.error(e.getMessage());
             return Optional.empty();
         }
     }
 
     @Override
-    public Optional<User> updateUser() {
-        return null;
+    public Optional<User> updateUser(User user) {
+        try (Connection c = Util.getConnection()) {
+            String sql = "UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setString(3, user.getEmail());
+            ps.setInt(4, user.getID());
+
+            int updated = ps.executeUpdate();
+            if (updated == 1) {
+                return Optional.of(new User(user.getID(), user.getFirstName(), user.getLastName(), user.getEmail()));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            l.error("Hello Error");
+            l.error(e.getMessage());
+            return Optional.empty();
+        }
     }
 }

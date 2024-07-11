@@ -2,7 +2,6 @@ package com.revature.Service;
 
 import com.revature.DAO.UserDAOImpl;
 import com.revature.Model.User;
-import com.revature.Util;
 
 import java.util.Optional;
 
@@ -16,5 +15,12 @@ public class UserService {
             return Optional.empty();
         }
         return userDAO.insertUser(user);
+    }
+
+    public Optional<User> updateUser(User user) {
+        if (userDAO.findUserById(user.getID()).isEmpty()) {
+            return Optional.empty();
+        }
+        return userDAO.updateUser(user);
     }
 }

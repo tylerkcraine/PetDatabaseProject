@@ -22,17 +22,36 @@ public class PetDatabaseController {
         this.petService = new PetService();
         Javalin app = Javalin.create();
         app.post("/register", this::createUserHandler);
+        app.put("/user", this::updateUserHandler);
         return app;
     }
 
-    private void createUserHandler(Context c) throws JsonProcessingException {
-        User user = this.mapper.readValue(c.body(), User.class);
-        Optional<User> newUser = this.userService.createUser(user);
-        if (newUser.isEmpty()) {
+    private void createUserHandler(Context c) {
+        try {
+            User user = this.mapper.readValue(c.body(), User.class);
+            Optional<User> newUser = this.userService.createUser(user);
+            if (newUser.isEmpty()) {
+                c.status(HttpStatus.BAD_REQUEST);
+            } else {
+                c.json(mapper.writeValueAsString(newUser.get()));
+                c.status(HttpStatus.CREATED);
+            }
+        } catch (JsonProcessingException e) {
             c.status(HttpStatus.BAD_REQUEST);
-        } else {
-            c.json(mapper.writeValueAsString(newUser.get()));
-            c.status(HttpStatus.CREATED);
+        }
+    }
+
+    private void updateUserHandler(Context c) {
+        try {
+            User user = this.mapper.readValue(c.body(), User.class);
+            Optional<User> newUser = this.userService.updateUser(user);
+            if (newUser.isEmpty()) {
+                c.status(HttpStatus.BAD_REQUEST);
+            } else {
+                c.status(HttpStatus.OK);
+            }
+        } catch (JsonProcessingException e) {
+            c.status(HttpStatus.BAD_REQUEST);
         }
     }
 }

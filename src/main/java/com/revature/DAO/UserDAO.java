@@ -11,5 +11,5 @@ public interface UserDAO {
     public Optional<User> findUserByEmail(String email);
     public Optional<User> findUserById(int id);
     public Optional<User> insertUser(User user) throws SQLException;
-    public Optional<User> updateUser();
+    public Optional<User> updateUser(User user);
 }
