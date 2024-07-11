@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +15,51 @@ public class UserDAOImpl implements UserDAO {
     Logger l = LoggerFactory.getLogger(this.getClass());
     @Override
     public List<User> findAllUsers() {
-        return null;
+        ArrayList<User> users = new ArrayList<>();
+        try (Connection c = Util.getConnection()) {
+            String sql = "SELECT * FROM users;";
+            PreparedStatement ps = c.prepareStatement(sql);
+
+            ps.executeQuery();
+            ResultSet rs = ps.getResultSet();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String newEmail = rs.getString("email");
+                users.add(new User(id, firstName, lastName, newEmail));
+            }
+        } catch (SQLException e) {
+            l.error("SQL Error in UserDAOImpl.findUserById()");
+            l.error(e.getMessage());
+            return new ArrayList<>();
+        }
+        return users;
     }
 
     @Override
     public Optional<User> findUserByEmail(String email) {
-        return null;
+        try (Connection c = Util.getConnection()) {
+            String sql = "SELECT * FROM users WHERE email = ?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+
+            ps.executeQuery();
+            ResultSet rs = ps.getResultSet();
+            if (rs.next()) {
+                int newId = rs.getInt("id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String newEmail = rs.getString("email");
+                return Optional.of(new User(newId, firstName, lastName, newEmail));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            l.error("SQL Error in UserDAOImpl.findUserById()");
+            l.error(e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -88,7 +128,7 @@ public class UserDAOImpl implements UserDAO {
                 return Optional.empty();
             }
         } catch (SQLException e) {
-            l.error("Hello Error");
+            l.error("SQL Error in UserDAOImpl.updateUser()");
             l.error(e.getMessage());
             return Optional.empty();
         }

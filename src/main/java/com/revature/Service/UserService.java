@@ -3,6 +3,7 @@ package com.revature.Service;
 import com.revature.DAO.UserDAOImpl;
 import com.revature.Model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UserService {
@@ -22,5 +23,13 @@ public class UserService {
             return Optional.empty();
         }
         return userDAO.updateUser(user);
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userDAO.findUserByEmail(email);
+    }
+
+    public List<User> findAllUsers() {
+        return userDAO.findAllUsers();
     }
 }

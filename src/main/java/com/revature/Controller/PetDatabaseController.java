@@ -9,6 +9,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public class PetDatabaseController {
@@ -23,6 +24,8 @@ public class PetDatabaseController {
         Javalin app = Javalin.create();
         app.post("/register", this::createUserHandler);
         app.put("/user", this::updateUserHandler);
+        app.get("/user/byEmail", this::getUserByEmailHandler);
+        app.get("/users", this::getUsers);
         return app;
     }
 
@@ -53,5 +56,25 @@ public class PetDatabaseController {
         } catch (JsonProcessingException e) {
             c.status(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private void getUserByEmailHandler(Context c) {
+        try {
+            String email = this.mapper.readTree(c.body()).get("email").asText();
+            Optional<User> newUser = this.userService.findUserByEmail(email);
+            if (newUser.isEmpty()) {
+                c.status(HttpStatus.BAD_REQUEST);
+            } else {
+                c.status(HttpStatus.OK);
+                c.json(mapper.writeValueAsString(newUser.get()));
+            }
+        } catch (JsonProcessingException e) {
+            c.status(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void getUsers(Context c) {
+        List<User> users = this.userService.findAllUsers();
+        c.json(users);
     }
 }
