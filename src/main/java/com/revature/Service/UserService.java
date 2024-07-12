@@ -10,8 +10,8 @@ public class UserService {
 
     private final UserDAOImpl userDAO = new UserDAOImpl();
     public Optional<User> createUser(User user) throws IllegalArgumentException{
-        if (user.getEmail().isBlank() |
-                user.getFirstName().isBlank() |
+        if (user.getEmail().isBlank() ||
+                user.getFirstName().isBlank() ||
                 user.getLastName().isBlank()) {
             return Optional.empty();
         }

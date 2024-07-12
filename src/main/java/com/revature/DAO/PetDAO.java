@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PetDAO {
-    public List<Pet> findAllPets();
-    public List<Pet> findPetsByUserId(int UserId);
-    public Optional<Pet> insertPet(Pet pet);
-    public void removePet(Pet pet);
+    List<Pet> findAllPets();
+    List<Pet> findPetsByUserId(int UserId);
+    Optional<Pet> insertPet(Pet pet);
+    void removePet(int petId);
 }

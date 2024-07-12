@@ -2,6 +2,7 @@ package com.revature.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.Model.Pet;
 import com.revature.Model.User;
 import com.revature.Service.PetService;
 import com.revature.Service.UserService;
@@ -25,7 +26,12 @@ public class PetDatabaseController {
         app.post("/register", this::createUserHandler);
         app.put("/user", this::updateUserHandler);
         app.get("/user/byEmail", this::getUserByEmailHandler);
-        app.get("/users", this::getUsers);
+        app.get("/users", this::getUsersHandler);
+
+        app.post("/pet", this::createPetHandler);
+        app.get("/pets", this::getPetsHandler);
+        app.get("/pet/byUserId", this::getPetsByUserIdHandler);
+        app.delete("/pet", this::removePetHandler);
         return app;
     }
 
@@ -73,8 +79,41 @@ public class PetDatabaseController {
         }
     }
 
-    private void getUsers(Context c) {
+    private void getUsersHandler(Context c) {
         List<User> users = this.userService.findAllUsers();
         c.json(users);
+    }
+
+    private void createPetHandler(Context c) {
+        Pet newPet = c.bodyAsClass(Pet.class);
+        Optional<Pet> pet = petService.insertPet(newPet);
+        if (pet.isEmpty()) {
+            c.status(HttpStatus.BAD_REQUEST);
+        } else {
+            c.json(pet.get());
+        }
+    }
+
+    private void getPetsHandler(Context c) {
+        List<Pet> petList = petService.findALLPets();
+        c.json(petList);
+    }
+
+    private void getPetsByUserIdHandler(Context c) {
+        try {
+            int ownerId = mapper.readTree(c.body()).get("ownerID").asInt();
+            c.json(petService.findPetsByUserId(ownerId));
+        } catch (JsonProcessingException e) {
+            c.status(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void removePetHandler(Context c) {
+        try {
+            int petId = mapper.readTree(c.body()).get("petID").asInt();
+            petService.removePet(petId);
+        } catch (JsonProcessingException e) {
+            c.status(HttpStatus.OK);
+        }
     }
 }
