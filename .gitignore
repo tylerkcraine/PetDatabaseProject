@@ -39,3 +39,6 @@ build/
 
 ##IntelliJ Ignore
 .idea/
+
+##Log file ignore
+petDatabase.log
